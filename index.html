@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Your Own Sustainable Farm</title>
+<style>
+  :root {
+    --green: #2f6b3a;
+    --green-light: #e8f3ea;
+    --amber: #b7791f;
+    --amber-light: #fdf6e3;
+    --red: #b03a2e;
+    --red-light: #fdecea;
+    --blue: #2c5f8a;
+    --blue-light: #e8f1f8;
+    --ink: #1f2a24;
+    --muted: #5c6b62;
+    --border: #d5ded8;
+    --bg: #f6f8f6;
+    --card: #ffffff;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  header {
+    background: var(--green);
+    color: #fff;
+    padding: 20px 24px;
+  }
+  header h1 { margin: 0 0 4px; font-size: 1.4rem; }
+  header p { margin: 0; opacity: 0.9; font-size: 0.9rem; }
+  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 80px; }
+  .progress { display: flex; gap: 6px; margin-bottom: 20px; }
+  .progress span {
+    flex: 1; height: 6px; border-radius: 3px;
+    background: var(--border); transition: background 0.3s;
+  }
+  .progress span.done { background: var(--green); }
+  .progress span.current { background: var(--amber); }
+
+  .step { display: none; }
+  .step.active { display: block; animation: fade 0.25s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  h2 { font-size: 1.2rem; margin: 0 0 6px; }
+  .hint { color: var(--muted); font-size: 0.9rem; margin: 0 0 18px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+  }
+  .option {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    user-select: none;
+  }
+  .option:hover { border-color: var(--green); transform: translateY(-1px); }
+  .option.selected { border-color: var(--green); background: var(--green-light); }
+  .option.disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+  .option h3 { margin: 0 0 4px; font-size: 1rem; }
+  .option .meta { font-size: 0.82rem; color: var(--muted); }
+  .option .warn {
+    margin-top: 8px; font-size: 0.8rem; color: var(--red);
+    background: var(--red-light); padding: 4px 8px; border-radius: 6px;
+  }
+
+  label.field { display: block; margin-bottom: 16px; }
+  label.field span { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
+  input[type="text"], textarea, select {
+    width: 100%; padding: 10px 12px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    font: inherit; background: var(--card);
+  }
+  input[type="text"]:focus, textarea:focus, select:focus {
+    outline: none; border-color: var(--green);
+  }
+  textarea { min-height: 90px; resize: vertical; }
+
+  .research-box {
+    background: var(--blue-light);
+    border-left: 4px solid var(--blue);
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin: 16px 0;
+    font-size: 0.88rem;
+  }
+  .research-box strong { color: var(--blue); }
+  .research-box ul { margin: 6px 0 0; padding-left: 20px; }
+  .research-box li { margin-bottom: 3px; }
+  .research-box .sources { margin-top: 8px; font-style: italic; color: var(--muted); }
+
+  .nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
+  button {
+    font: inherit; font-weight: 600; padding: 10px 20px;
+    border-radius: 8px; border: none; cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+  }
+  .btn-primary { background: var(--green); color: #fff; }
+  .btn-primary:hover { background: #255a2f; }
+  .btn-secondary { background: transparent; color: var(--green); border: 1.5px solid var(--green); }
+  .btn-secondary:hover { background: var(--green-light); }
+  .btn-roll {
+    background: var(--amber); color: #fff; font-size: 1.1rem;
+    padding: 16px 32px; border-radius: 12px;
+    box-shadow: 0 4px 0 #8e5e18;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .btn-roll:hover { transform: translateY(-1px); }
+  .btn-roll:active { transform: translateY(2px); box-shadow: 0 2px 0 #8e5e18; }
+  .btn-roll:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .dice-stage {
+    text-align: center;
+    padding: 30px 0;
+  }
+  .dice {
+    display: inline-block;
+    width: 90px; height: 90px;
+    background: var(--card);
+    border: 3px solid var(--ink);
+    border-radius: 16px;
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 90px;
+    color: var(--ink);
+    transition: transform 0.1s;
+  }
+  .dice.rolling { animation: shake 0.4s infinite; }
+  @keyframes shake {
+    0%, 100% { transform: rotate(0deg) translateY(0); }
+    25% { transform: rotate(-8deg) translateY(-4px); }
+    75% { transform: rotate(8deg) translateY(-4px); }
+  }
+
+  .outcome {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-top: 20px;
+  }
+  .outcome.success { border-color: var(--green); background: var(--green-light); }
+  .outcome.warning { border-color: var(--amber); background: var(--amber-light); }
+  .outcome.failure { border-color: var(--red); background: var(--red-light); }
+  .outcome h3 { margin: 0 0 8px; font-size: 1.1rem; }
+  .outcome p { margin: 0 0 8px; }
+  .outcome .delta { font-weight: 700; }
+
+  .score-display {
+    background: var(--ink);
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: var(--radius);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 16px 0;
+    font-size: 1rem;
+  }
+  .score-display strong { font-size: 1.4rem; }
+  .score-bar-wrap {
+    background: var(--border);
+    border-radius: 10px;
+    height: 12px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .score-bar {
+    height: 100%;
+    background: var(--green);
+    transition: width 0.6s ease;
+  }
+
+  .summary {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+  .summary h3 { margin: 0 0 4px; color: var(--green); font-size: 1.3rem; }
+  .summary .farm-byline { color: var(--muted); font-size: 0.85rem; margin-bottom: 18px; }
+  .summary dl { margin: 0; }
+  .summary dt {
+    font-weight: 600; font-size: 0.85rem; text-transform: uppercase;
+    letter-spacing: 0.03em; color: var(--muted); margin-top: 14px;
+  }
+  .summary dd { margin: 2px 0 0; }
+  .summary .badge {
+    display: inline-block; background: var(--amber-light);
+    color: var(--amber); font-size: 0.8rem; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px; margin-top: 16px;
+  }
+  .summary .badge.ok { background: var(--green-light); color: var(--green); }
+  .summary .badge.warn { background: var(--red-light); color: var(--red); }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+
+  .roll-history {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 12px;
+  }
+
+  @media print {
+    header, .progress, .nav, .actions, .hint, .research-box { display: none !important; }
+    body { background: #fff; }
+    main { padding: 0; max-width: 100%; }
+    .summary { border: 1px solid #999; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Design Your Own Sustainable Farm</h1>
+  <p>Year 9 Geography · Sustainable Biomes · NSW</p>
+</header>
+
+<main>
+  <div class="progress" id="progress"></div>
+
+  <!-- STEP 1: Names -->
+  <section class="step active" data-step="0">
+    <h2>1. Name your farm</h2>
+    <p class="hint">You've inherited a block of land. Give it a name and tell us who's running it.</p>
+    <label class="field">
+      <span>Farm name</span>
+      <input type="text" id="farmName" placeholder="e.g. Wirraminna Station" maxlength="60">
+    </label>
+    <label class="field">
+      <span>Farmer(s)</span>
+      <input type="text" id="farmers" placeholder="Your name or group members" maxlength="80">
+    </label>
+    <div class="nav">
+      <span></span>
+      <button class="btn-primary" id="next0" disabled>Next →</button>
+    </div>
+  </section>
+
+  <!-- STEP 2: Region -->
+  <section class="step" data-step="1">
+    <h2>2. Choose your region</h2>
+    <p class="hint">Pick where your farm is. Climate and rainfall will shape what you can grow.</p>
+    <div class="grid" id="regionGrid"></div>
+
+    <div id="regionResearch" style="display:none;">
+      <div class="research-box">
+        <strong>🔍 Justify your region choice</strong>
+        <p>Before you move on, do a quick search and write 1–2 sentences explaining why this region's climate, rainfall and soil make it suitable for farming.</p>
+        <ul>
+          <li>What is the average annual rainfall in your region?</li>
+          <li>What soil types are common there?</li>
+          <li>What agricultural industries are already established in this region?</li>
+        </ul>
+        <div class="sources">Suggested sources: Bureau of Meteorology (bom.gov.au), GRDC Grower Regions, NSW DPI, your textbook.</div>
+      </div>
+      <label class="field">
+        <span>Your justification</span>
+        <textarea id="justifyRegion" placeholder="I chose the Riverina because..."></textarea>
+      </label>
+    </div>
+
+    <div class="nav">
+      <button class="btn-secondary" data-back>← Back</button>
+      <button class="btn-primary" id="next1" disabled>Next →</button>
+    </div>
+  </section>
+
+  <!-- STEP 3: Produce -->
+  <section class="step" data-step="2">
+    <h2>3. Choose your produce</h2>
+    <p class="hint">Options that don't suit your region are dimmed. You can still pick them — but read the warning.</p>
+    <div class="grid" id="cropGrid"></div>
+
+    <div id="cropResearch" style="display:none;">
+      <div class="research-box">
+        <strong>🔍 Research your crop</strong>
+        <p>Find three facts about your chosen crop and explain why it suits (or struggles with) your region.</p>
+        <ul>
+          <li>What growing conditions does this crop need (rainfall, temperature, soil)?</li>
+          <li>How long is the growing season?</li>
+          <li>What is the biggest environmental risk to this crop in your region?</li>
+        </ul>
+        <div class="sources">Suggested sources: GRDC, MLA, NSW DPI, CSIRO, AgriFutures.</div>
+      </div>
+      <label class="field">
+        <span>Three facts and why this crop suits your region</span>
+        <textarea id="justifyCrop" placeholder="Fact 1: ... Fact 2: ... Fact 3: ... This suits my region because..."></textarea>
+      </label>
+    </div>
+
+    <div class="nav">
+      <button class="btn-secondary" data-back>← Back</button>
+      <button class="btn-primary" id="next2" disabled>Next →</button>
+    </div>
+  </section>
+
+  <!-- STEP 4: Challenge -->
+  <section class="step" data-step="3">
+    <h2>4. Face the challenge</h2>
+    <p class="hint">Every biome pushes back. What's the biggest environmental threat to your farm?</p>
+    <div class="grid" id="challengeGrid"></div>
+
+    <div id="challengeResearch" style="display:none;">
+      <div class="research-box">
+        <strong>🔍 Research your challenge</strong>
+        <p>Use a source to find out how this challenge affects farms in your region and what farmers are already doing about it.</p>
+        <ul>
+          <li>How does this challenge reduce farm productivity?</li>
+          <li>Is this challenge getting worse due to climate change?</li>
+          <li>What solutions have farmers already tried in your region?</li>
+        </ul>
+        <div class="sources">Suggested sources: NSW DPI, CSIRO, Bureau of Meteorology, Landcare Australia.</div>
+      </div>
+      <label class="field">
+        <span>How does this challenge affect your farm specifically?</span>
+        <textarea id="justifyChallenge" placeholder="This challenge affects my farm because..."></textarea>
+      </label>
+    </div>
+
+    <div class="nav">
+      <button class="btn-secondary" data-back>← Back</button>
+      <button class="btn-primary" id="next3" disabled>Next →</button>
+    </div>
+  </section>
+
+  <!-- STEP 5: Strategy -->
+  <section class="step" data-step="4">
+    <h2>5. Choose your sustainable fix</h2>
+    <p class="hint">How will you farm sustainably and reduce the problem you identified?</p>
+    <div class="grid" id="strategyGrid"></div>
+
+    <div id="strategyResearch" style="display:none;">
+      <div class="research-box">
+        <strong>🔍 Research your strategy</strong>
+        <p>Find evidence that this strategy works. Look for a case study, statistic or example of a real Australian farm using it.</p>
+        <ul>
+          <li>How much does this strategy reduce the problem (e.g. "cuts water use by X%")?</li>
+          <li>What is the upfront cost, and does it save money long-term?</li>
+          <li>Find one real Australian farm or region using this strategy.</li>
+        </ul>
+        <div class="sources">Suggested sources: Landcare Australia, GRDC, MLA, NSW DPI, CSIRO, Farmers for Climate Action.</div>
+      </div>
+      <label class="field">
+        <span>Evidence that this strategy works</span>
+        <textarea id="justifyStrategy" placeholder="This strategy works because... For example, [case study/statistic]..."></textarea>
+      </label>
+    </div>
+
+    <div class="nav">
+      <button class="btn-secondary" data-back>← Back</button>
+      <button class="btn-primary" id="next4" disabled>Next →</button>
+    </div>
+  </section>
+
+  <!-- STEP 6: Dice roll -->
+  <section class="step" data-step="5">
+    <h2>6. Season of chance</h2>
+    <p class="hint">Every farm faces unpredictable seasons. Roll the d20 to see how the next season treats your farm — and how well your strategy holds up.</p>
+
+    <div class="score-display">
+      <span>Farm sustainability score</span>
+      <strong id="scoreValue">0</strong>
+    </div>
+    <div class="score-bar-wrap"><div class="score-bar" id="scoreBar" style="width:0%"></div></div>
+
+    <div class="dice-stage">
+      <div class="dice" id="dice">?</div>
+      <div style="margin-top:20px;">
+        <button class="btn-roll" id="rollBtn">Roll the d20</button>
+      </div>
+    </div>
+
+    <div id="outcomeArea"></div>
+
+    <div class="nav">
+      <button class="btn-secondary" data-back>← Back</button>
+      <button class="btn-primary" id="next5" disabled>Next →</button>
+    </div>
+  </section>
+
+  <!-- STEP 7: Summary -->
+  <section class="step" data-step="6">
+    <h2>7. Your farm pitch</h2>
+    <p class="hint">Screenshot or print this card to submit to your teacher.</p>
+    <div class="summary" id="summary"></div>
+    <div class="actions">
+      <button class="btn-primary" id="printBtn">Print / Save as PDF</button>
+      <button class="btn-secondary" id="copyBtn">Copy as text</button>
+      <button class="btn-secondary" id="restartBtn">Start over</button>
+    </div>
+    <p class="hint" id="copyMsg" style="margin-top:10px;color:var(--green);display:none;">Copied to clipboard.</p>
+  </section>
+</main>
+
+<script>
+// ---------- DATA ----------
+const regions = [
+  { id: "riverina", name: "Riverina",
+    climate: "Warm, low–moderate rainfall (400–500mm). Flat plains, irrigation-dependent.",
+    note: "Salinity and water scarcity are key risks.",
+    chance: { drought: -1, flood: +1, fire: 0 } },
+  { id: "nw-nsw", name: "North West NSW",
+    climate: "Semi-arid, low rainfall (300–450mm), hot summers, drought-prone.",
+    note: "Good for dryland cropping and wool.",
+    chance: { drought: -2, flood: -1, fire: +1 } },
+  { id: "hunter", name: "Hunter Valley",
+    climate: "Warm temperate, moderate–high rainfall (700–1000mm).",
+    note: "Suits horticulture and viticulture; erosion and flooding risks.",
+    chance: { drought: 0, flood: +1, fire: 0 } },
+  { id: "coastal", name: "NSW Coastal",
+    climate: "High rainfall (1000mm+), humid, fertile but leached soils.",
+    note: "Dairy and horticulture; land degradation and flooding risks.",
+    chance: { drought: +1, flood: +2, fire: -1 } },
+  { id: "tablelands", name: "Northern Tablelands",
+    climate: "Cool, moderate–high rainfall (800–1200mm).",
+    note: "Suits grazing and cool-climate crops; frost risk.",
+    chance: { drought: 0, flood: 0, fire: 0 } }
+];
+
+const crops = [
+  { id: "wheat", name: "Dryland wheat", water: "low",
+    suits: ["nw-nsw","riverina"],
+    warning: "Wheat needs reliable winter rain — risky in high-rainfall coastal zones." },
+  { id: "rice", name: "Rice", water: "very high",
+    suits: ["riverina"],
+    warning: "Rice is very water-intensive. Water scarcity is a major challenge in low-rainfall zones." },
+  { id: "wool", name: "Sheep (wool)", water: "low–moderate",
+    suits: ["nw-nsw","tablelands","riverina"],
+    warning: "Sheep suit drier country but need careful grazing management to avoid erosion." },
+  { id: "cattle", name: "Beef cattle", water: "moderate–high",
+    suits: ["tablelands","coastal","hunter"],
+    warning: "Cattle need reliable pasture — risky in semi-arid zones without irrigation." },
+  { id: "dairy", name: "Dairy", water: "high",
+    suits: ["coastal","hunter"],
+    warning: "Dairy needs high rainfall or irrigation; land degradation is a risk." },
+  { id: "oranges", name: "Oranges (citrus)", water: "moderate–high",
+    suits: ["riverina","hunter"],
+    warning: "Citrus is frost-sensitive and needs irrigation in low-rainfall zones." },
+  { id: "grapes", name: "Grapes (viticulture)", water: "moderate",
+    suits: ["hunter","tablelands"],
+    warning: "Grapes need the right climate — too much rain causes disease." }
+];
+
+const challenges = [
+  { id: "drought", name: "Drought & water scarcity", type: "drought",
+    regions: ["nw-nsw","riverina","tablelands"],
+    desc: "Prolonged dry periods reduce yields and pasture growth." },
+  { id: "salinity", name: "Soil salinity", type: "drought",
+    regions: ["riverina","nw-nsw"],
+    desc: "Rising salt tables damage soil and crops." },
+  { id: "erosion", name: "Soil erosion", type: "flood",
+    regions: ["nw-nsw","tablelands","hunter","coastal"],
+    desc: "Wind and water strip topsoil, reducing fertility." },
+  { id: "flooding", name: "Flooding", type: "flood",
+    regions: ["coastal","hunter","riverina"],
+    desc: "Excess water waterlogs soil and damages crops." },
+  { id: "frost", name: "Frost", type: "fire",
+    regions: ["tablelands","hunter"],
+    desc: "Frost damages crops and reduces yields." },
+  { id: "pests", name: "Pests & weeds", type: "fire",
+    regions: ["riverina","nw-nsw","hunter","coastal","tablelands"],
+    desc: "Pests and weeds reduce yields and require costly control." }
+];
+
+// Each strategy has a "goodAgainst" list of challenge types it works best against
+const strategies = [
+  { id: "drip", name: "Drip irrigation",
+    helps: "Delivers water directly to roots, cutting water use by up to 50%.",
+    goodAgainst: ["drought"] },
+  { id: "rotation", name: "Rotational grazing",
+    helps: "Resting paddocks lets pasture recover and reduces erosion.",
+    goodAgainst: ["drought","flood"] },
+  { id: "windbreak", name: "Native tree windbreaks",
+    helps: "Reduces wind erosion and provides habitat for beneficial insects.",
+    goodAgainst: ["drought","flood"] },
+  { id: "tillage", name: "Minimum tillage",
+    helps: "Keeps soil structure intact, reducing erosion and improving water retention.",
+    goodAgainst: ["drought","flood"] },
+  { id: "cover", name: "Cover cropping",
+    helps: "Protects soil between seasons and adds organic matter.",
+    goodAgainst: ["drought","flood"] },
+  { id: "compost", name: "Composting & organic matter",
+    helps: "Improves soil health, water holding capacity, and salinity tolerance.",
+    goodAgainst: ["drought"] },
+  { id: "drainage", name: "Drainage & water management",
+    helps: "Prevents waterlogging and flooding damage.",
+    goodAgainst: ["flood"] },
+  { id: "ipm", name: "Integrated pest management",
+    helps: "Uses natural predators and targeted sprays to reduce chemical use.",
+    goodAgainst: ["fire"] }
+];
+
+// d20 outcome table: threshold → {band, score delta, message}
+// Ranges shift depending on how well strategy matches challenge
+function getOutcome(roll, matchQuality, challengeType, regionChance) {
+  // matchQuality: 2 = direct match, 1 = partial match, 0 = no match
+  // Adjust the roll: good match makes low rolls less punishing
+  const adjusted = roll + (matchQuality === 2 ? 2 : matchQuality === 1 ? 1 : -1);
+
+  // Region-based modifier for the *event type*
+  const regionEventMod = regionChance ? (regionChance[challengeType] || 0) : 0;
+
+  if (adjusted >= 18) {
+    return {
+      band: "success",
+      score: 3 + (matchQuality === 2 ? 1 : 0),
+      title: "A bumper season!",
+      body: matchQuality === 2
+        ? "Your strategy paid off beautifully. Excellent rainfall (or dry weather, as needed), strong yields, and the farm is in great shape. Your careful matching of strategy to challenge is the reason."
+        : "Great season — but note that your strategy wasn't a perfect fit for the challenge. A lucky year helped, but you'd want a better match for next season."
+    };
+  }
+  if (adjusted >= 12) {
+    return {
+      band: "success",
+      score: 2,
+      title: "A solid season",
+      body: matchQuality === 2
+        ? "Good rain, good yields. Your strategy held up well against the challenge you identified."
+        : "Reasonable season. The farm held together, but your strategy was stretched. Consider whether a different fix would have done better."
+    };
+  }
+  if (adjusted >= 8) {
+    return {
+      band: "warning",
+      score: 0,
+      title: "A mixed season",
+      body: matchQuality === 2
+        ? "Your strategy reduced the damage, but conditions were tough. The farm broke even — a good reminder that even good planning can't control the weather."
+        : "The farm struggled. Your strategy wasn't well matched to the challenge, and it showed. Think about which strategy would have coped better."
+    };
+  }
+  if (adjusted >= 4) {
+    return {
+      band: "failure",
+      score: -2,
+      title: "A hard season",
+      body: matchQuality === 2
+        ? "Even with a strong strategy, this season hurt. Yields were down significantly. The good news: your strategy should help you recover faster than a farm without one."
+        : "Yields dropped sharply. The challenge hit harder than your strategy could handle. Look again at what you chose — was it the right tool for this problem?"
+    };
+  }
+  return {
+    band: "failure",
+    score: -3,
+    title: "A disastrous season",
+    body: matchQuality === 2
+      ? "Even with a strong strategy, this season was devastating. Drought, flood or fire overwhelmed your farm. This is the reality of Australian farming — resilience matters, but so does luck."
+      : "The season was devastating. Your strategy was poorly matched to the challenge, and the farm couldn't cope. This is why matching strategies to specific environmental problems matters so much."
+  };
+}
+
+// ---------- STATE ----------
+const state = {
+  farmName: "", farmers: "", region: null, crop: null, challenge: null, strategy: null,
+  justifyRegion: "", justifyCrop: "", justifyChallenge: "", justifyStrategy: "",
+  score: 0, roll: null, outcome: null
+};
+let currentStep = 0;
+
+// ---------- PROGRESS ----------
+const steps = document.querySelectorAll('.step');
+const progressEl = document.getElementById('progress');
+const TOTAL = steps.length;
+for (let i = 0; i < TOTAL; i++) {
+  const s = document.createElement('span');
+  if (i === 0) s.classList.add('current');
+  progressEl.appendChild(s);
+}
+function updateProgress() {
+  progressEl.querySelectorAll('span').forEach((s, i) => {
+    s.classList.toggle('done', i < currentStep);
+    s.classList.toggle('current', i === currentStep);
+  });
+}
+function showStep(n) {
+  steps.forEach((s, i) => s.classList.toggle('active', i === n));
+  currentStep = n;
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ---------- STEP 1 ----------
+const farmNameInput = document.getElementById('farmName');
+const farmersInput = document.getElementById('farmers');
+const next0 = document.getElementById('next0');
+function checkNames() {
+  state.farmName = farmNameInput.value.trim();
+  state.farmers = farmersInput.value.trim();
+  next0.disabled = !(state.farmName && state.farmers);
+}
+farmNameInput.addEventListener('input', checkNames);
+farmersInput.addEventListener('input', checkNames);
+next0.addEventListener('click', () => showStep(1));
+
+// ---------- STEP 2: REGION ----------
+const regionGrid = document.getElementById('regionGrid');
+const next1 = document.getElementById('next1');
+const regionResearch = document.getElementById('regionResearch');
+const justifyRegion = document.getElementById('justifyRegion');
+
+regions.forEach(r => {
+  const div = document.createElement('div');
+  div.className = 'option';
+  div.innerHTML = `<h3>${r.name}</h3><div class="meta">${r.climate}</div><div class="meta" style="margin-top:6px;font-style:italic;">${r.note}</div>`;
+  div.addEventListener('click', () => {
+    regionGrid.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    div.classList.add('selected');
+    state.region = r;
+    regionResearch.style.display = 'block';
+    checkRegionReady();
+  });
+  regionGrid.appendChild(div);
+});
+function checkRegionReady() {
+  next1.disabled = !(state.region && justifyRegion.value.trim().length >= 20);
+}
+justifyRegion.addEventListener('input', () => { state.justifyRegion = justifyRegion.value.trim(); checkRegionReady(); });
+next1.addEventListener('click', () => { renderCrops(); showStep(2); });
+
+// ---------- STEP 3: CROPS ----------
+const cropGrid = document.getElementById('cropGrid');
+const next2 = document.getElementById('next2');
+const cropResearch = document.getElementById('cropResearch');
+const justifyCrop = document.getElementById('justifyCrop');
+
+function renderCrops() {
+  cropGrid.innerHTML = '';
+  state.crop = null;
+  next2.disabled = true;
+  cropResearch.style.display = 'none';
+  justifyCrop.value = '';
+  crops.forEach(c => {
+    const suits = c.suits.includes(state.region.id);
+    const div = document.createElement('div');
+    div.className = 'option' + (suits ? '' : ' disabled');
+    div.innerHTML = `<h3>${c.name}</h3><div class="meta">Water demand: ${c.water}</div>` +
+      (!suits ? `<div class="warn">${c.warning}</div>` : '');
+    if (suits) {
+      div.addEventListener('click', () => {
+        cropGrid.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+        div.classList.add('selected');
+        state.crop = c;
+        cropResearch.style.display = 'block';
+        checkCropReady();
+      });
+    }
+    cropGrid.appendChild(div);
+  });
+}
+function checkCropReady() {
+  next2.disabled = !(state.crop && justifyCrop.value.trim().length >= 20);
+}
+justifyCrop.addEventListener('input', () => { state.justifyCrop = justifyCrop.value.trim(); checkCropReady(); });
+next2.addEventListener('click', () => { renderChallenges(); showStep(3); });
+
+// ---------- STEP 4: CHALLENGES ----------
+const challengeGrid = document.getElementById('challengeGrid');
+const next3 = document.getElementById('next3');
+const challengeResearch = document.getElementById('challengeResearch');
+const justifyChallenge = document.getElementById('justifyChallenge');
+
+function renderChallenges() {
+  challengeGrid.innerHTML = '';
+  state.challenge = null;
+  next3.disabled = true;
+  challengeResearch.style.display = 'none';
+  justifyChallenge.value = '';
+  const relevant = challenges.filter(c => c.regions.includes(state.region.id));
+  const others = challenges.filter(c => !c.regions.includes(state.region.id));
+  [...relevant, ...others].forEach(c => {
+    const fits = c.regions.includes(state.region.id);
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.innerHTML = `<h3>${c.name}</h3><div class="meta">${c.desc}</div>` +
+      (!fits ? `<div class="warn" style="background:var(--amber-light);color:var(--amber);">Less common in ${state.region.name}, but possible.</div>` : '');
+    div.addEventListener('click', () => {
+      challengeGrid.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+      div.classList.add('selected');
+      state.challenge = c;
+      challengeResearch.style.display = 'block';
+      checkChallengeReady();
+    });
+    challengeGrid.appendChild(div);
+  });
+}
+function checkChallengeReady() {
+  next3.disabled = !(state.challenge && justifyChallenge.value.trim().length >= 20);
+}
+justifyChallenge.addEventListener('input', () => { state.justifyChallenge = justifyChallenge.value.trim(); checkChallengeReady(); });
+next3.addEventListener('click', () => { renderStrategies(); showStep(4); });
+
+// ---------- STEP 5: STRATEGIES ----------
+const strategyGrid = document.getElementById('strategyGrid');
+const next4 = document.getElementById('next4');
+const strategyResearch = document.getElementById('strategyResearch');
+const justifyStrategy = document.getElementById('justifyStrategy');
+
+function renderStrategies() {
+  strategyGrid.innerHTML = '';
+  state.strategy = null;
+  next4.disabled = true;
+  strategyResearch.style.display = 'none';
+  justifyStrategy.value = '';
+  strategies.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.innerHTML = `<h3>${s.name}</h3><div class="meta">${s.helps}</div>`;
+    div.addEventListener('click', () => {
+      strategyGrid.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+      div.classList.add('selected');
+      state.strategy = s;
+      strategyResearch.style.display = 'block';
+      checkStrategyReady();
+    });
+    strategyGrid.appendChild(div);
+  });
+}
+function checkStrategyReady() {
+  next4.disabled = !(state.strategy && justifyStrategy.value.trim().length >= 20);
+}
+justifyStrategy.addEventListener('input', () => { state.justifyStrategy = justifyStrategy.value.trim(); checkStrategyReady(); });
+next4.addEventListener('click', () => { updateScoreDisplay(); showStep(5); });
+
+// ---------- STEP 6: DICE ROLL ----------
+const dice = document.getElementById('dice');
+const rollBtn = document.getElementById('rollBtn');
+const outcomeArea = document.getElementById('outcomeArea');
+const next5 = document.getElementById('next5');
+const scoreValue = document.getElementById('scoreValue');
+const scoreBar = document.getElementById('scoreBar');
+let hasRolled = false;
+
+function updateScoreDisplay() {
+  scoreValue.textContent = state.score;
+  const pct = Math.max(0, Math.min(100, (state.score + 5) * 5));
+  scoreBar.style.width = pct + '%';
+  scoreBar.style.background = state.score < 0 ? 'var(--red)' : state.score < 2 ? 'var(--amber)' : 'var(--green)';
+}
+
+// Determine match quality between strategy and challenge
+function getMatchQuality() {
+  if (!state.strategy || !state.challenge) return 0;
+  if (state.strategy.goodAgainst.includes(state.challenge.type)) return 2;
+  // partial: strategy helps against at least one challenge type in general
+  return 1;
+}
+
+function rollD20() {
+  return Math.floor(Math.random() * 20) + 1;
+}
+
+rollBtn.addEventListener('click', () => {
+  if (hasRolled) return;
+  hasRolled = true;
+  rollBtn.disabled = true;
+  dice.classList.add('rolling');
+
+  let ticks = 0;
+  const interval = setInterval(() => {
+    dice.textContent = rollD20();
+    ticks++;
+    if (ticks > 15) {
+      clearInterval(interval);
+      dice.classList.remove('rolling');
+      finaliseRoll();
+    }
+  }, 80);
+});
+
+function finaliseRoll() {
+  const roll = rollD20();
+  dice.textContent = roll;
+  state.roll = roll;
+  const match = getMatchQuality();
+  const challengeType = state.challenge.type;
+  const regionChance = state.region.chance;
+
+  const outcome = getOutcome(roll, match, challengeType, regionChance);
+  state.outcome = outcome;
+  state.score += outcome.score;
+
+  const matchLabel = match === 2 ? "strong match" : match === 1 ? "partial match" : "weak match";
+  const matchColor = match === 2 ? "var(--green)" : match === 1 ? "var(--amber)" : "var(--red)";
+
+  outcomeArea.innerHTML = `
+    <div class="outcome ${outcome.band}">
+      <h3>${outcome.title}</h3>
+      <p>${outcome.body}</p>
+      <p style="margin-top:12px;font-size:0.85rem;color:var(--muted);">
+        Roll: <strong>${roll}</strong> · Strategy vs challenge: <strong style="color:${matchColor};">${matchLabel}</strong>
+        · Season impact: <span class="delta" style="color:${outcome.score >= 0 ? 'var(--green)' : 'var(--red)'};">${outcome.score >= 0 ? '+' : ''}${outcome.score} points</span>
+      </p>
+    </div>
+    <div class="roll-history">
+      Your region's climate also influenced the outcome: ${state.region.name} is ${state.region.note.toLowerCase()}
+    </div>
+  `;
+  updateScoreDisplay();
+  next5.disabled = false;
+}
+next5.addEventListener('click', () => { renderSummary(); showStep(6); });
+
+// ---------- STEP 7: SUMMARY ----------
+function renderSummary() {
+  const s = state;
+  const el = document.getElementById('summary');
+  const scoreBand = s.score >= 4 ? 'ok' : s.score >= 0 ? 'warn' : 'warn';
+  const scoreLabel = s.score >= 4 ? 'A resilient farm' : s.score >= 0 ? 'A farm that survived the season' : 'A farm that struggled';
+  el.innerHTML = `
+    <h3>${escapeHtml(s.farmName)}</h3>
+    <div class="farm-byline">Run by ${escapeHtml(s.farmers)}</div>
+    <dl>
+      <dt>Region</dt><dd>${s.region.name} — ${s.region.climate}</dd>
+      <dt>Why this region</dt><dd>${s.justifyRegion ? escapeHtml(s.justifyRegion) : '<em>Not provided</em>'}</dd>
+
+      <dt>Produce</dt><dd>${s.crop.name} (water demand: ${s.crop.water})</dd>
+      <dt>Research on the crop</dt><dd>${s.justifyCrop ? escapeHtml(s.justifyCrop) : '<em>Not provided</em>'}</dd>
+
+      <dt>Challenge</dt><dd>${s.challenge.name} — ${s.challenge.desc}</dd>
+      <dt>How the challenge affects the farm</dt><dd>${s.justifyChallenge ? escapeHtml(s.justifyChallenge) : '<em>Not provided</em>'}</dd>
+
+      <dt>Sustainable strategy</dt><dd>${s.strategy.name} — ${s.strategy.helps}</dd>
+      <dt>Research on the strategy</dt><dd>${s.justifyStrategy ? escapeHtml(s.justifyStrategy) : '<em>Not provided</em>'}</dd>
+
+      <dt>Season of chance (d20 roll: ${s.roll})</dt>
+      <dd><strong>${s.outcome.title}</strong> — ${s.outcome.body}</dd>
+
+      <dt>Sustainability score</dt><dd>${s.score} / 10</dd>
+    </dl>
+    <div class="badge ${scoreBand}">${scoreLabel}</div>
+  `;
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  const s = state;
+  const text =
+`FARM DESIGN PITCH
+Farm: ${s.farmName}
+Farmer(s): ${s.farmers}
+
+REGION: ${s.region.name} — ${s.region.climate}
+Justification: ${s.justifyRegion || '(not provided)'}
+
+PRODUCE: ${s.crop.name} (water demand: ${s.crop.water})
+Research: ${s.justifyCrop || '(not provided)'}
+
+CHALLENGE: ${s.challenge.name} — ${s.challenge.desc}
+Impact: ${s.justifyChallenge || '(not provided)'}
+
+SUSTAINABLE STRATEGY: ${s.strategy.name} — ${s.strategy.helps}
+Research: ${s.justifyStrategy || '(not provided)'}
+
+SEASON OF CHANCE (d20 roll: ${s.roll})
+${s.outcome.title} — ${s.outcome.body}
+
+Sustainability score: ${s.score} / 10`;
+  try {
+    await navigator.clipboard.writeText(text);
+    const msg = document.getElementById('copyMsg');
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 2500);
+  } catch (e) {
+    alert('Copy failed — please select and copy manually.');
+  }
+});
+
+document.getElementById('restartBtn').addEventListener('click', () => {
+  if (!confirm('Start over? This will clear all your answers.')) return;
+  location.reload();
+});
+
+// ---------- BACK BUTTONS ----------
+document.querySelectorAll('[data-back]').forEach(btn => {
+  btn.addEventListener('click', () => showStep(currentStep - 1));
+});
+</script>
+</body>
+</html>
