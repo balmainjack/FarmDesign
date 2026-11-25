@@ -6,216 +6,240 @@
 <title>Design Your Own Sustainable Farm</title>
 <style>
   :root {
-    --green: #2f6b3a;
-    --green-light: #e8f3ea;
-    --amber: #b7791f;
-    --amber-light: #fdf6e3;
-    --red: #b03a2e;
-    --red-light: #fdecea;
-    --blue: #2c5f8a;
-    --blue-light: #e8f1f8;
-    --ink: #1f2a24;
-    --muted: #5c6b62;
-    --border: #d5ded8;
-    --bg: #f6f8f6;
-    --card: #ffffff;
-    --radius: 10px;
+    --green: #2f6b3a; --green-light: #e8f3ea; --green-dark: #1e4d28;
+    --amber: #b7791f; --amber-light: #fdf6e3;
+    --red: #b03a2e; --red-light: #fdecea;
+    --blue: #2c5f8a; --blue-light: #e8f1f8;
+    --ink: #1f2a24; --muted: #5c6b62;
+    --border: #d5ded8; --bg: #f6f8f6; --card: #ffffff;
+    --radius: 12px;
   }
   * { box-sizing: border-box; }
   body {
-    margin: 0;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    line-height: 1.5;
+    margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.5;
   }
-  header {
-    background: var(--green);
+  /* ---------- HERO HEADER ---------- */
+  .hero {
+    position: relative;
+    background: linear-gradient(135deg, #2f6b3a 0%, #4a8c4e 60%, #6ba85e 100%);
     color: #fff;
-    padding: 20px 24px;
+    padding: 28px 24px 60px;
+    overflow: hidden;
   }
-  header h1 { margin: 0 0 4px; font-size: 1.4rem; }
-  header p { margin: 0; opacity: 0.9; font-size: 0.9rem; }
-  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 80px; }
-  .progress { display: flex; gap: 6px; margin-bottom: 20px; }
+  .hero-content { position: relative; z-index: 2; max-width: 900px; margin: 0 auto; }
+  .hero h1 { margin: 0 0 6px; font-size: 1.6rem; letter-spacing: -0.01em; }
+  .hero p { margin: 0; opacity: 0.92; font-size: 0.95rem; }
+  .hero-silhouette {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    width: 100%; height: 80px; display: block;
+  }
+  /* ---------- LAYOUT ---------- */
+  main { max-width: 900px; margin: 0 auto; padding: 24px 16px 80px; }
+  .progress { display: flex; gap: 6px; margin: -40px 0 24px; position: relative; z-index: 3; }
   .progress span {
-    flex: 1; height: 6px; border-radius: 3px;
-    background: var(--border); transition: background 0.3s;
+    flex: 1; height: 8px; border-radius: 4px;
+    background: rgba(255,255,255,0.4); transition: background 0.3s;
   }
-  .progress span.done { background: var(--green); }
-  .progress span.current { background: var(--amber); }
+  .progress span.done { background: var(--amber); }
+  .progress span.current { background: #ffd97a; box-shadow: 0 0 0 2px rgba(255,217,122,0.4); }
 
   .step { display: none; }
-  .step.active { display: block; animation: fade 0.25s ease; }
-  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .step.active { display: block; animation: fade 0.3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-  h2 { font-size: 1.2rem; margin: 0 0 6px; }
+  h2 { font-size: 1.3rem; margin: 0 0 6px; }
   .hint { color: var(--muted); font-size: 0.9rem; margin: 0 0 18px; }
 
+  /* ---------- OPTION CARDS ---------- */
   .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 12px;
   }
   .option {
-    background: var(--card);
-    border: 2px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    cursor: pointer;
-    transition: border-color 0.15s, background 0.15s, transform 0.1s;
-    user-select: none;
+    background: var(--card); border: 2px solid var(--border); border-radius: var(--radius);
+    padding: 16px; cursor: pointer; transition: all 0.15s; user-select: none;
+    position: relative; overflow: hidden;
   }
-  .option:hover { border-color: var(--green); transform: translateY(-1px); }
+  .option:hover { border-color: var(--green); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
   .option.selected { border-color: var(--green); background: var(--green-light); }
   .option.disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+  .option .icon {
+    font-size: 2.2rem; line-height: 1; display: block; margin-bottom: 6px;
+  }
   .option h3 { margin: 0 0 4px; font-size: 1rem; }
   .option .meta { font-size: 0.82rem; color: var(--muted); }
+  .option .note {
+    font-size: 0.8rem; color: var(--muted); font-style: italic; margin-top: 6px;
+    padding-top: 6px; border-top: 1px dashed var(--border);
+  }
   .option .warn {
     margin-top: 8px; font-size: 0.8rem; color: var(--red);
     background: var(--red-light); padding: 4px 8px; border-radius: 6px;
   }
+  .option .tag {
+    display: inline-block; font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 2px 8px; border-radius: 10px; margin-top: 6px;
+  }
+  .tag.low { background: #d4edda; color: #1e6b2e; }
+  .tag.med { background: #fff3cd; color: #856404; }
+  .tag.high { background: #f8d7da; color: #842029; }
 
+  /* ---------- FORM ---------- */
   label.field { display: block; margin-bottom: 16px; }
   label.field span { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
-  input[type="text"], textarea, select {
-    width: 100%; padding: 10px 12px;
-    border: 1.5px solid var(--border); border-radius: 8px;
+  input[type="text"], textarea {
+    width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px;
     font: inherit; background: var(--card);
   }
-  input[type="text"]:focus, textarea:focus, select:focus {
-    outline: none; border-color: var(--green);
-  }
+  input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px var(--green-light); }
   textarea { min-height: 90px; resize: vertical; }
 
+  /* ---------- RESEARCH BOX ---------- */
   .research-box {
-    background: var(--blue-light);
-    border-left: 4px solid var(--blue);
-    padding: 12px 16px;
-    border-radius: 6px;
-    margin: 16px 0;
-    font-size: 0.88rem;
+    background: var(--blue-light); border-left: 4px solid var(--blue);
+    padding: 12px 16px; border-radius: 6px; margin: 16px 0; font-size: 0.88rem;
   }
   .research-box strong { color: var(--blue); }
   .research-box ul { margin: 6px 0 0; padding-left: 20px; }
   .research-box li { margin-bottom: 3px; }
   .research-box .sources { margin-top: 8px; font-style: italic; color: var(--muted); }
 
+  /* ---------- BUTTONS ---------- */
   .nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
   button {
-    font: inherit; font-weight: 600; padding: 10px 20px;
-    border-radius: 8px; border: none; cursor: pointer;
-    transition: background 0.15s, opacity 0.15s;
+    font: inherit; font-weight: 600; padding: 10px 20px; border-radius: 8px;
+    border: none; cursor: pointer; transition: all 0.15s;
   }
   .btn-primary { background: var(--green); color: #fff; }
-  .btn-primary:hover { background: #255a2f; }
+  .btn-primary:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); }
   .btn-secondary { background: transparent; color: var(--green); border: 1.5px solid var(--green); }
-  .btn-secondary:hover { background: var(--green-light); }
+  .btn-secondary:hover:not(:disabled) { background: var(--green-light); }
   .btn-roll {
-    background: var(--amber); color: #fff; font-size: 1.1rem;
-    padding: 16px 32px; border-radius: 12px;
-    box-shadow: 0 4px 0 #8e5e18;
-    transition: transform 0.1s, box-shadow 0.1s;
+    background: linear-gradient(135deg, #b7791f, #d68910); color: #fff; font-size: 1.1rem;
+    padding: 16px 36px; border-radius: 14px;
+    box-shadow: 0 4px 0 #8e5e18; transition: transform 0.1s, box-shadow 0.1s;
   }
-  .btn-roll:hover { transform: translateY(-1px); }
-  .btn-roll:active { transform: translateY(2px); box-shadow: 0 2px 0 #8e5e18; }
-  .btn-roll:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-roll:hover:not(:disabled) { transform: translateY(-1px); }
+  .btn-roll:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 #8e5e18; }
   button:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  .dice-stage {
-    text-align: center;
-    padding: 30px 0;
+  /* ---------- SEASONS ---------- */
+  .seasons-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px; margin: 20px 0;
   }
-  .dice {
-    display: inline-block;
-    width: 90px; height: 90px;
-    background: var(--card);
-    border: 3px solid var(--ink);
-    border-radius: 16px;
-    font-size: 2.6rem;
-    font-weight: 800;
-    line-height: 90px;
-    color: var(--ink);
-    transition: transform 0.1s;
+  .season-card {
+    background: var(--card); border: 2px solid var(--border); border-radius: var(--radius);
+    padding: 20px 16px; text-align: center; min-height: 260px;
+    transition: all 0.3s;
   }
-  .dice.rolling { animation: shake 0.4s infinite; }
+  .season-card.pending { background: #fafafa; border-style: dashed; }
+  .season-card.excellent { border-color: var(--green); background: linear-gradient(180deg, #fff 0%, var(--green-light) 100%); }
+  .season-card.good { border-color: #4a8c4e; background: linear-gradient(180deg, #fff 0%, #eef8ef 100%); }
+  .season-card.ok { border-color: #6ba85e; }
+  .season-card.mixed { border-color: var(--amber); background: linear-gradient(180deg, #fff 0%, var(--amber-light) 100%); }
+  .season-card.bad { border-color: #d97706; background: linear-gradient(180deg, #fff 0%, #fef3e2 100%); }
+  .season-card.disaster { border-color: var(--red); background: linear-gradient(180deg, #fff 0%, var(--red-light) 100%); }
+
+  .season-header {
+    font-weight: 700; font-size: 1rem; margin-bottom: 12px;
+    text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted);
+  }
+  .season-dice {
+    display: inline-block; width: 70px; height: 70px; line-height: 70px;
+    background: #fff; border: 3px solid var(--ink); border-radius: 12px;
+    font-size: 2rem; font-weight: 800; margin-bottom: 12px;
+    box-shadow: 0 4px 0 var(--border);
+  }
+  .season-dice.rolling { animation: shake 0.3s infinite; }
+  .season-dice.final { border-color: var(--amber); box-shadow: 0 4px 0 #8e5e18; }
   @keyframes shake {
-    0%, 100% { transform: rotate(0deg) translateY(0); }
+    0%, 100% { transform: rotate(0) translateY(0); }
     25% { transform: rotate(-8deg) translateY(-4px); }
     75% { transform: rotate(8deg) translateY(-4px); }
   }
+  .season-result { font-size: 0.9rem; }
+  .season-result .event-display { font-size: 1.5rem; margin-bottom: 6px; }
+  .season-result .roll-display { font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+  .season-result .delta-display { font-size: 1.4rem; font-weight: 800; margin: 6px 0; }
+  .season-result .delta-display.positive { color: var(--green); }
+  .season-result .delta-display.negative { color: var(--red); }
+  .season-result .message-display { font-size: 0.85rem; color: var(--ink); margin-top: 8px; line-height: 1.4; }
+  .match-badge {
+    display: inline-block; font-size: 0.75rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 12px; margin-top: 8px;
+    background: #d4edda; color: #1e6b2e;
+  }
+  .match-badge.miss { background: var(--red-light); color: var(--red); }
+  .rolling-text { color: var(--muted); font-style: italic; }
 
-  .outcome {
-    background: var(--card);
-    border: 2px solid var(--border);
-    border-radius: var(--radius);
-    padding: 18px 20px;
-    margin-top: 20px;
+  /* ---------- SCORE DISPLAY ---------- */
+  .score-banner {
+    background: linear-gradient(135deg, #1f2a24, #2f4a35); color: #fff;
+    padding: 16px 22px; border-radius: var(--radius); margin: 20px 0;
+    display: flex; justify-content: space-between; align-items: center;
   }
-  .outcome.success { border-color: var(--green); background: var(--green-light); }
-  .outcome.warning { border-color: var(--amber); background: var(--amber-light); }
-  .outcome.failure { border-color: var(--red); background: var(--red-light); }
-  .outcome h3 { margin: 0 0 8px; font-size: 1.1rem; }
-  .outcome p { margin: 0 0 8px; }
-  .outcome .delta { font-weight: 700; }
+  .score-banner .score-label { font-size: 0.85rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.05em; }
+  .score-banner .score-value { font-size: 2rem; font-weight: 800; }
+  .score-banner .score-value.positive { color: #a5e8a5; }
+  .score-banner .score-value.negative { color: #ff9e8e; }
+  .score-bar-wrap { background: rgba(255,255,255,0.2); border-radius: 6px; height: 8px; margin-top: 8px; overflow: hidden; }
+  .score-bar { height: 100%; background: #a5e8a5; transition: width 0.6s ease; }
 
-  .score-display {
-    background: var(--ink);
-    color: #fff;
-    padding: 14px 20px;
-    border-radius: var(--radius);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 16px 0;
-    font-size: 1rem;
-  }
-  .score-display strong { font-size: 1.4rem; }
-  .score-bar-wrap {
-    background: var(--border);
-    border-radius: 10px;
-    height: 12px;
-    overflow: hidden;
-    margin-top: 8px;
-  }
-  .score-bar {
-    height: 100%;
-    background: var(--green);
-    transition: width 0.6s ease;
-  }
-
+  /* ---------- SUMMARY ---------- */
   .summary {
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px;
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: var(--radius); padding: 24px; position: relative; overflow: hidden;
   }
-  .summary h3 { margin: 0 0 4px; color: var(--green); font-size: 1.3rem; }
-  .summary .farm-byline { color: var(--muted); font-size: 0.85rem; margin-bottom: 18px; }
+  .summary::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+    background: linear-gradient(90deg, #2f6b3a, #6ba85e, #b7791f);
+  }
+  .summary h3 { margin: 8px 0 4px; color: var(--green); font-size: 1.4rem; }
+  .summary .farm-byline { color: var(--muted); font-size: 0.88rem; margin-bottom: 20px; }
   .summary dl { margin: 0; }
   .summary dt {
-    font-weight: 600; font-size: 0.85rem; text-transform: uppercase;
-    letter-spacing: 0.03em; color: var(--muted); margin-top: 14px;
+    font-weight: 700; font-size: 0.8rem; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--muted); margin-top: 16px;
+    display: flex; align-items: center; gap: 6px;
   }
-  .summary dd { margin: 2px 0 0; }
+  .summary dt .icon { font-size: 1rem; }
+  .summary dd { margin: 3px 0 0; }
+  .summary .season-summary {
+    display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;
+  }
+  .summary .season-pill {
+    padding: 6px 12px; border-radius: 20px; font-size: 0.82rem; font-weight: 600;
+  }
+  .season-pill.excellent, .season-pill.good { background: var(--green-light); color: var(--green); }
+  .season-pill.ok { background: #eef8ef; color: #4a8c4e; }
+  .season-pill.mixed { background: var(--amber-light); color: var(--amber); }
+  .season-pill.bad, .season-pill.disaster { background: var(--red-light); color: var(--red); }
   .summary .badge {
-    display: inline-block; background: var(--amber-light);
-    color: var(--amber); font-size: 0.8rem; font-weight: 600;
-    padding: 3px 10px; border-radius: 20px; margin-top: 16px;
+    display: inline-block; font-size: 0.9rem; font-weight: 700;
+    padding: 8px 16px; border-radius: 20px; margin-top: 20px;
   }
-  .summary .badge.ok { background: var(--green-light); color: var(--green); }
-  .summary .badge.warn { background: var(--red-light); color: var(--red); }
+  .badge.thriving { background: linear-gradient(135deg, #d4edda, #a5e8a5); color: var(--green); }
+  .badge.resilient { background: var(--green-light); color: var(--green); }
+  .badge.surviving { background: var(--amber-light); color: var(--amber); }
+  .badge.struggling { background: #fef3e2; color: #d97706; }
+  .badge.failed { background: var(--red-light); color: var(--red); }
 
   .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
 
-  .roll-history {
-    font-size: 0.85rem;
-    color: var(--muted);
-    margin-top: 12px;
+  /* ---------- CONFETTI ---------- */
+  .confetti {
+    position: fixed; top: -10px; font-size: 1.5rem;
+    animation: fall 3s linear forwards; pointer-events: none; z-index: 999;
+  }
+  @keyframes fall {
+    to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
   }
 
   @media print {
-    header, .progress, .nav, .actions, .hint, .research-box { display: none !important; }
+    .hero, .progress, .nav, .actions, .hint, .research-box, .confetti { display: none !important; }
     body { background: #fff; }
     main { padding: 0; max-width: 100%; }
     .summary { border: 1px solid #999; }
@@ -224,15 +248,26 @@
 </head>
 <body>
 
-<header>
-  <h1>Design Your Own Sustainable Farm</h1>
-  <p>Year 9 Geography · Sustainable Biomes · NSW</p>
+<header class="hero">
+  <div class="hero-content">
+    <h1>🌾 Design Your Own Sustainable Farm</h1>
+    <p>Year 9 Geography · Sustainable Biomes · NSW</p>
+  </div>
+  <svg class="hero-silhouette" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,80 L0,45 Q100,25 200,38 T400,32 T600,38 T800,30 T1000,40 T1200,32 L1200,80 Z" fill="rgba(255,255,255,0.13)"/>
+    <rect x="880" y="42" width="60" height="38" fill="rgba(255,255,255,0.18)"/>
+    <polygon points="873,42 947,42 910,20" fill="rgba(255,255,255,0.18)"/>
+    <circle cx="180" cy="45" r="18" fill="rgba(255,255,255,0.13)"/>
+    <rect x="176" y="58" width="8" height="22" fill="rgba(255,255,255,0.13)"/>
+    <circle cx="1050" cy="48" r="14" fill="rgba(255,255,255,0.13)"/>
+    <rect x="1047" y="58" width="6" height="22" fill="rgba(255,255,255,0.13)"/>
+  </svg>
 </header>
 
 <main>
   <div class="progress" id="progress"></div>
 
-  <!-- STEP 1: Names -->
+  <!-- STEP 1 -->
   <section class="step active" data-step="0">
     <h2>1. Name your farm</h2>
     <p class="hint">You've inherited a block of land. Give it a name and tell us who's running it.</p>
@@ -250,12 +285,11 @@
     </div>
   </section>
 
-  <!-- STEP 2: Region -->
+  <!-- STEP 2 -->
   <section class="step" data-step="1">
     <h2>2. Choose your region</h2>
     <p class="hint">Pick where your farm is. Climate and rainfall will shape what you can grow.</p>
     <div class="grid" id="regionGrid"></div>
-
     <div id="regionResearch" style="display:none;">
       <div class="research-box">
         <strong>🔍 Justify your region choice</strong>
@@ -272,19 +306,17 @@
         <textarea id="justifyRegion" placeholder="I chose the Riverina because..."></textarea>
       </label>
     </div>
-
     <div class="nav">
       <button class="btn-secondary" data-back>← Back</button>
       <button class="btn-primary" id="next1" disabled>Next →</button>
     </div>
   </section>
 
-  <!-- STEP 3: Produce -->
+  <!-- STEP 3 -->
   <section class="step" data-step="2">
     <h2>3. Choose your produce</h2>
     <p class="hint">Options that don't suit your region are dimmed. You can still pick them — but read the warning.</p>
     <div class="grid" id="cropGrid"></div>
-
     <div id="cropResearch" style="display:none;">
       <div class="research-box">
         <strong>🔍 Research your crop</strong>
@@ -301,19 +333,17 @@
         <textarea id="justifyCrop" placeholder="Fact 1: ... Fact 2: ... Fact 3: ... This suits my region because..."></textarea>
       </label>
     </div>
-
     <div class="nav">
       <button class="btn-secondary" data-back>← Back</button>
       <button class="btn-primary" id="next2" disabled>Next →</button>
     </div>
   </section>
 
-  <!-- STEP 4: Challenge -->
+  <!-- STEP 4 -->
   <section class="step" data-step="3">
     <h2>4. Face the challenge</h2>
     <p class="hint">Every biome pushes back. What's the biggest environmental threat to your farm?</p>
     <div class="grid" id="challengeGrid"></div>
-
     <div id="challengeResearch" style="display:none;">
       <div class="research-box">
         <strong>🔍 Research your challenge</strong>
@@ -330,19 +360,17 @@
         <textarea id="justifyChallenge" placeholder="This challenge affects my farm because..."></textarea>
       </label>
     </div>
-
     <div class="nav">
       <button class="btn-secondary" data-back>← Back</button>
       <button class="btn-primary" id="next3" disabled>Next →</button>
     </div>
   </section>
 
-  <!-- STEP 5: Strategy -->
+  <!-- STEP 5 -->
   <section class="step" data-step="4">
     <h2>5. Choose your sustainable fix</h2>
     <p class="hint">How will you farm sustainably and reduce the problem you identified?</p>
     <div class="grid" id="strategyGrid"></div>
-
     <div id="strategyResearch" style="display:none;">
       <div class="research-box">
         <strong>🔍 Research your strategy</strong>
@@ -359,43 +387,57 @@
         <textarea id="justifyStrategy" placeholder="This strategy works because... For example, [case study/statistic]..."></textarea>
       </label>
     </div>
-
     <div class="nav">
       <button class="btn-secondary" data-back>← Back</button>
       <button class="btn-primary" id="next4" disabled>Next →</button>
     </div>
   </section>
 
-  <!-- STEP 6: Dice roll -->
+  <!-- STEP 6: THREE SEASONS -->
   <section class="step" data-step="5">
-    <h2>6. Season of chance</h2>
-    <p class="hint">Every farm faces unpredictable seasons. Roll the d20 to see how the next season treats your farm — and how well your strategy holds up.</p>
+    <h2>6. Three seasons of chance</h2>
+    <p class="hint">A farm isn't judged on one season — it's judged on three. Roll once per season to see how your strategy holds up.</p>
 
-    <div class="score-display">
-      <span>Farm sustainability score</span>
-      <strong id="scoreValue">0</strong>
+    <div class="score-banner">
+      <div>
+        <div class="score-label">Running total</div>
+        <div class="score-bar-wrap"><div class="score-bar" id="runningBar" style="width: 0%"></div></div>
+      </div>
+      <div class="score-value" id="runningScore">0</div>
     </div>
-    <div class="score-bar-wrap"><div class="score-bar" id="scoreBar" style="width:0%"></div></div>
 
-    <div class="dice-stage">
-      <div class="dice" id="dice">?</div>
-      <div style="margin-top:20px;">
-        <button class="btn-roll" id="rollBtn">Roll the d20</button>
+    <div class="seasons-grid" id="seasonsGrid">
+      <div class="season-card pending" id="season-1">
+        <div class="season-header">🌱 Year 1</div>
+        <div class="season-dice">?</div>
+        <div class="season-result"><span class="rolling-text">Not yet rolled</span></div>
+      </div>
+      <div class="season-card pending" id="season-2">
+        <div class="season-header">🌿 Year 2</div>
+        <div class="season-dice">?</div>
+        <div class="season-result"><span class="rolling-text">Not yet rolled</span></div>
+      </div>
+      <div class="season-card pending" id="season-3">
+        <div class="season-header">🌾 Year 3</div>
+        <div class="season-dice">?</div>
+        <div class="season-result"><span class="rolling-text">Not yet rolled</span></div>
       </div>
     </div>
 
-    <div id="outcomeArea"></div>
+    <div style="text-align:center; margin-top: 10px;">
+      <button class="btn-roll" id="rollBtn">Roll Season 1 🎲</button>
+    </div>
 
     <div class="nav">
       <button class="btn-secondary" data-back>← Back</button>
-      <button class="btn-primary" id="next5" disabled>Next →</button>
+      <button class="btn-primary" id="next5" disabled>See summary →</button>
     </div>
   </section>
 
-  <!-- STEP 7: Summary -->
+  <!-- STEP 7: SUMMARY -->
   <section class="step" data-step="6">
     <h2>7. Your farm pitch</h2>
-    <p class="hint">Screenshot or print this card to submit to your teacher.</p>
+    <p class="hint">Review your three seasons, then screenshot or print this card.</p>
     <div class="summary" id="summary"></div>
     <div class="actions">
       <button class="btn-primary" id="printBtn">Print / Save as PDF</button>
@@ -407,221 +449,198 @@
 </main>
 
 <script>
-// ---------- DATA ----------
+// =====================================================
+// DATA
+// =====================================================
 const regions = [
-  { id: "riverina", name: "Riverina",
+  { id: "riverina", name: "Riverina", icon: "🌾", color: "#e8d5a3",
     climate: "Warm, low–moderate rainfall (400–500mm). Flat plains, irrigation-dependent.",
     note: "Salinity and water scarcity are key risks.",
-    chance: { drought: -1, flood: +1, fire: 0 } },
-  { id: "nw-nsw", name: "North West NSW",
+    chance: { drought: 1, flood: 1, fire: 0 } },
+  { id: "nw-nsw", name: "North West NSW", icon: "🏜️", color: "#e8c49a",
     climate: "Semi-arid, low rainfall (300–450mm), hot summers, drought-prone.",
     note: "Good for dryland cropping and wool.",
-    chance: { drought: -2, flood: -1, fire: +1 } },
-  { id: "hunter", name: "Hunter Valley",
+    chance: { drought: 2, flood: 0, fire: 1 } },
+  { id: "hunter", name: "Hunter Valley", icon: "🍇", color: "#d4b8d8",
     climate: "Warm temperate, moderate–high rainfall (700–1000mm).",
     note: "Suits horticulture and viticulture; erosion and flooding risks.",
-    chance: { drought: 0, flood: +1, fire: 0 } },
-  { id: "coastal", name: "NSW Coastal",
+    chance: { drought: 0, flood: 1, fire: 0 } },
+  { id: "coastal", name: "NSW Coastal", icon: "🌊", color: "#b8d8e8",
     climate: "High rainfall (1000mm+), humid, fertile but leached soils.",
     note: "Dairy and horticulture; land degradation and flooding risks.",
-    chance: { drought: +1, flood: +2, fire: -1 } },
-  { id: "tablelands", name: "Northern Tablelands",
+    chance: { drought: 0, flood: 2, fire: 0 } },
+  { id: "tablelands", name: "Northern Tablelands", icon: "⛰️", color: "#b8d8b8",
     climate: "Cool, moderate–high rainfall (800–1200mm).",
     note: "Suits grazing and cool-climate crops; frost risk.",
-    chance: { drought: 0, flood: 0, fire: 0 } }
+    chance: { drought: 0, flood: 1, fire: 1 } }
 ];
 
 const crops = [
-  { id: "wheat", name: "Dryland wheat", water: "low",
+  { id: "wheat", name: "Dryland wheat", icon: "🌾", water: "low",
     suits: ["nw-nsw","riverina"],
     warning: "Wheat needs reliable winter rain — risky in high-rainfall coastal zones." },
-  { id: "rice", name: "Rice", water: "very high",
+  { id: "rice", name: "Rice", icon: "🍚", water: "very high",
     suits: ["riverina"],
     warning: "Rice is very water-intensive. Water scarcity is a major challenge in low-rainfall zones." },
-  { id: "wool", name: "Sheep (wool)", water: "low–moderate",
+  { id: "wool", name: "Sheep (wool)", icon: "🐑", water: "low–moderate",
     suits: ["nw-nsw","tablelands","riverina"],
     warning: "Sheep suit drier country but need careful grazing management to avoid erosion." },
-  { id: "cattle", name: "Beef cattle", water: "moderate–high",
+  { id: "cattle", name: "Beef cattle", icon: "🐄", water: "moderate–high",
     suits: ["tablelands","coastal","hunter"],
     warning: "Cattle need reliable pasture — risky in semi-arid zones without irrigation." },
-  { id: "dairy", name: "Dairy", water: "high",
+  { id: "dairy", name: "Dairy", icon: "🥛", water: "high",
     suits: ["coastal","hunter"],
     warning: "Dairy needs high rainfall or irrigation; land degradation is a risk." },
-  { id: "oranges", name: "Oranges (citrus)", water: "moderate–high",
+  { id: "oranges", name: "Oranges (citrus)", icon: "🍊", water: "moderate–high",
     suits: ["riverina","hunter"],
     warning: "Citrus is frost-sensitive and needs irrigation in low-rainfall zones." },
-  { id: "grapes", name: "Grapes (viticulture)", water: "moderate",
+  { id: "grapes", name: "Grapes (viticulture)", icon: "🍇", water: "moderate",
     suits: ["hunter","tablelands"],
     warning: "Grapes need the right climate — too much rain causes disease." }
 ];
 
 const challenges = [
-  { id: "drought", name: "Drought & water scarcity", type: "drought",
+  { id: "drought", name: "Drought & water scarcity", icon: "☀️", type: "drought",
     regions: ["nw-nsw","riverina","tablelands"],
     desc: "Prolonged dry periods reduce yields and pasture growth." },
-  { id: "salinity", name: "Soil salinity", type: "drought",
+  { id: "salinity", name: "Soil salinity", icon: "🧂", type: "drought",
     regions: ["riverina","nw-nsw"],
     desc: "Rising salt tables damage soil and crops." },
-  { id: "erosion", name: "Soil erosion", type: "flood",
+  { id: "erosion", name: "Soil erosion", icon: "🏔️", type: "flood",
     regions: ["nw-nsw","tablelands","hunter","coastal"],
     desc: "Wind and water strip topsoil, reducing fertility." },
-  { id: "flooding", name: "Flooding", type: "flood",
+  { id: "flooding", name: "Flooding", icon: "🌊", type: "flood",
     regions: ["coastal","hunter","riverina"],
     desc: "Excess water waterlogs soil and damages crops." },
-  { id: "frost", name: "Frost", type: "fire",
+  { id: "frost", name: "Frost", icon: "❄️", type: "fire",
     regions: ["tablelands","hunter"],
     desc: "Frost damages crops and reduces yields." },
-  { id: "pests", name: "Pests & weeds", type: "fire",
+  { id: "pests", name: "Pests & weeds", icon: "🐛", type: "fire",
     regions: ["riverina","nw-nsw","hunter","coastal","tablelands"],
     desc: "Pests and weeds reduce yields and require costly control." }
 ];
 
-// Each strategy has a "goodAgainst" list of challenge types it works best against
 const strategies = [
-  { id: "drip", name: "Drip irrigation",
+  { id: "drip", name: "Drip irrigation", icon: "💧",
     helps: "Delivers water directly to roots, cutting water use by up to 50%.",
     goodAgainst: ["drought"] },
-  { id: "rotation", name: "Rotational grazing",
+  { id: "rotation", name: "Rotational grazing", icon: "🔄",
     helps: "Resting paddocks lets pasture recover and reduces erosion.",
     goodAgainst: ["drought","flood"] },
-  { id: "windbreak", name: "Native tree windbreaks",
+  { id: "windbreak", name: "Native tree windbreaks", icon: "🌳",
     helps: "Reduces wind erosion and provides habitat for beneficial insects.",
     goodAgainst: ["drought","flood"] },
-  { id: "tillage", name: "Minimum tillage",
+  { id: "tillage", name: "Minimum tillage", icon: "🚜",
     helps: "Keeps soil structure intact, reducing erosion and improving water retention.",
     goodAgainst: ["drought","flood"] },
-  { id: "cover", name: "Cover cropping",
+  { id: "cover", name: "Cover cropping", icon: "🌱",
     helps: "Protects soil between seasons and adds organic matter.",
     goodAgainst: ["drought","flood"] },
-  { id: "compost", name: "Composting & organic matter",
+  { id: "compost", name: "Composting & organic matter", icon: "♻️",
     helps: "Improves soil health, water holding capacity, and salinity tolerance.",
     goodAgainst: ["drought"] },
-  { id: "drainage", name: "Drainage & water management",
+  { id: "drainage", name: "Drainage & water management", icon: "🛠️",
     helps: "Prevents waterlogging and flooding damage.",
     goodAgainst: ["flood"] },
-  { id: "ipm", name: "Integrated pest management",
+  { id: "ipm", name: "Integrated pest management", icon: "🐞",
     helps: "Uses natural predators and targeted sprays to reduce chemical use.",
     goodAgainst: ["fire"] }
 ];
 
-// d20 outcome table: threshold → {band, score delta, message}
-// Ranges shift depending on how well strategy matches challenge
-function getOutcome(roll, matchQuality, challengeType, regionChance) {
-  // matchQuality: 2 = direct match, 1 = partial match, 0 = no match
-  // Adjust the roll: good match makes low rolls less punishing
-  const adjusted = roll + (matchQuality === 2 ? 2 : matchQuality === 1 ? 1 : -1);
+// Events, grouped by type. Each event has a matching type so the
+// strategy's "goodAgainst" list can be checked against the event.
+const EVENTS_BY_TYPE = {
+  drought: [
+    { type: "drought", icon: "☀️", name: "Drought", text: "A long dry spell shrivels crops." },
+    { type: "drought", icon: "🔥", name: "Heatwave", text: "Record-breaking heat stresses the farm." },
+    { type: "drought", icon: "🌵", name: "Dry spell", text: "Months without meaningful rain." }
+  ],
+  flood: [
+    { type: "flood", icon: "🌧️", name: "Flooding", text: "Heavy rain floods the paddocks." },
+    { type: "flood", icon: "⛈️", name: "Severe storm", text: "A storm damages crops and fences." },
+    { type: "flood", icon: "🌊", name: "Overland flow", text: "Water runs across the land, eroding soil." }
+  ],
+  fire: [
+    { type: "fire", icon: "🔥", name: "Bushfire", text: "Fire threatens the farm." },
+    { type: "fire", icon: "❄️", name: "Frost", text: "An unexpected frost kills young plants." },
+    { type: "fire", icon: "🦗", name: "Locust swarm", text: "A locust swarm descends on the paddocks." }
+  ]
+};
 
-  // Region-based modifier for the *event type*
-  const regionEventMod = regionChance ? (regionChance[challengeType] || 0) : 0;
-
-  if (adjusted >= 18) {
-    return {
-      band: "success",
-      score: 3 + (matchQuality === 2 ? 1 : 0),
-      title: "A bumper season!",
-      body: matchQuality === 2
-        ? "Your strategy paid off beautifully. Excellent rainfall (or dry weather, as needed), strong yields, and the farm is in great shape. Your careful matching of strategy to challenge is the reason."
-        : "Great season — but note that your strategy wasn't a perfect fit for the challenge. A lucky year helped, but you'd want a better match for next season."
-    };
-  }
-  if (adjusted >= 12) {
-    return {
-      band: "success",
-      score: 2,
-      title: "A solid season",
-      body: matchQuality === 2
-        ? "Good rain, good yields. Your strategy held up well against the challenge you identified."
-        : "Reasonable season. The farm held together, but your strategy was stretched. Consider whether a different fix would have done better."
-    };
-  }
-  if (adjusted >= 8) {
-    return {
-      band: "warning",
-      score: 0,
-      title: "A mixed season",
-      body: matchQuality === 2
-        ? "Your strategy reduced the damage, but conditions were tough. The farm broke even — a good reminder that even good planning can't control the weather."
-        : "The farm struggled. Your strategy wasn't well matched to the challenge, and it showed. Think about which strategy would have coped better."
-    };
-  }
-  if (adjusted >= 4) {
-    return {
-      band: "failure",
-      score: -2,
-      title: "A hard season",
-      body: matchQuality === 2
-        ? "Even with a strong strategy, this season hurt. Yields were down significantly. The good news: your strategy should help you recover faster than a farm without one."
-        : "Yields dropped sharply. The challenge hit harder than your strategy could handle. Look again at what you chose — was it the right tool for this problem?"
-    };
-  }
-  return {
-    band: "failure",
-    score: -3,
-    title: "A disastrous season",
-    body: matchQuality === 2
-      ? "Even with a strong strategy, this season was devastating. Drought, flood or fire overwhelmed your farm. This is the reality of Australian farming — resilience matters, but so does luck."
-      : "The season was devastating. Your strategy was poorly matched to the challenge, and the farm couldn't cope. This is why matching strategies to specific environmental problems matters so much."
-  };
-}
-
-// ---------- STATE ----------
+// =====================================================
+// STATE
+// =====================================================
 const state = {
-  farmName: "", farmers: "", region: null, crop: null, challenge: null, strategy: null,
+  farmName: "", farmers: "", region: null, crop: null,
+  challenge: null, strategy: null,
   justifyRegion: "", justifyCrop: "", justifyChallenge: "", justifyStrategy: "",
-  score: 0, roll: null, outcome: null
+  seasons: [],          // array of 3 results
+  total: 0
 };
 let currentStep = 0;
 
-// ---------- PROGRESS ----------
-const steps = document.querySelectorAll('.step');
-const progressEl = document.getElementById('progress');
+// =====================================================
+// PROGRESS
+// =====================================================
+const steps = document.querySelectorAll(".step");
+const progressEl = document.getElementById("progress");
 const TOTAL = steps.length;
 for (let i = 0; i < TOTAL; i++) {
-  const s = document.createElement('span');
-  if (i === 0) s.classList.add('current');
+  const s = document.createElement("span");
+  if (i === 0) s.classList.add("current");
   progressEl.appendChild(s);
 }
 function updateProgress() {
-  progressEl.querySelectorAll('span').forEach((s, i) => {
-    s.classList.toggle('done', i < currentStep);
-    s.classList.toggle('current', i === currentStep);
+  progressEl.querySelectorAll("span").forEach((s, i) => {
+    s.classList.toggle("done", i < currentStep);
+    s.classList.toggle("current", i === currentStep);
   });
 }
 function showStep(n) {
-  steps.forEach((s, i) => s.classList.toggle('active', i === n));
+  steps.forEach((s, i) => s.classList.toggle("active", i === n));
   currentStep = n;
   updateProgress();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// ---------- STEP 1 ----------
-const farmNameInput = document.getElementById('farmName');
-const farmersInput = document.getElementById('farmers');
-const next0 = document.getElementById('next0');
+// =====================================================
+// STEP 1
+// =====================================================
+const farmNameInput = document.getElementById("farmName");
+const farmersInput = document.getElementById("farmers");
+const next0 = document.getElementById("next0");
 function checkNames() {
   state.farmName = farmNameInput.value.trim();
   state.farmers = farmersInput.value.trim();
   next0.disabled = !(state.farmName && state.farmers);
 }
-farmNameInput.addEventListener('input', checkNames);
-farmersInput.addEventListener('input', checkNames);
-next0.addEventListener('click', () => showStep(1));
+farmNameInput.addEventListener("input", checkNames);
+farmersInput.addEventListener("input", checkNames);
+next0.addEventListener("click", () => showStep(1));
 
-// ---------- STEP 2: REGION ----------
-const regionGrid = document.getElementById('regionGrid');
-const next1 = document.getElementById('next1');
-const regionResearch = document.getElementById('regionResearch');
-const justifyRegion = document.getElementById('justifyRegion');
+// =====================================================
+// STEP 2: REGION
+// =====================================================
+const regionGrid = document.getElementById("regionGrid");
+const next1 = document.getElementById("next1");
+const regionResearch = document.getElementById("regionResearch");
+const justifyRegion = document.getElementById("justifyRegion");
 
 regions.forEach(r => {
-  const div = document.createElement('div');
-  div.className = 'option';
-  div.innerHTML = `<h3>${r.name}</h3><div class="meta">${r.climate}</div><div class="meta" style="margin-top:6px;font-style:italic;">${r.note}</div>`;
-  div.addEventListener('click', () => {
-    regionGrid.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-    div.classList.add('selected');
+  const div = document.createElement("div");
+  div.className = "option";
+  div.style.borderLeftColor = r.color;
+  div.style.borderLeftWidth = "6px";
+  div.innerHTML = `
+    <span class="icon">${r.icon}</span>
+    <h3>${r.name}</h3>
+    <div class="meta">${r.climate}</div>
+    <div class="note">${r.note}</div>`;
+  div.addEventListener("click", () => {
+    regionGrid.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
+    div.classList.add("selected");
     state.region = r;
-    regionResearch.style.display = 'block';
+    regionResearch.style.display = "block";
     checkRegionReady();
   });
   regionGrid.appendChild(div);
@@ -629,33 +648,40 @@ regions.forEach(r => {
 function checkRegionReady() {
   next1.disabled = !(state.region && justifyRegion.value.trim().length >= 20);
 }
-justifyRegion.addEventListener('input', () => { state.justifyRegion = justifyRegion.value.trim(); checkRegionReady(); });
-next1.addEventListener('click', () => { renderCrops(); showStep(2); });
+justifyRegion.addEventListener("input", () => { state.justifyRegion = justifyRegion.value.trim(); checkRegionReady(); });
+next1.addEventListener("click", () => { renderCrops(); showStep(2); });
 
-// ---------- STEP 3: CROPS ----------
-const cropGrid = document.getElementById('cropGrid');
-const next2 = document.getElementById('next2');
-const cropResearch = document.getElementById('cropResearch');
-const justifyCrop = document.getElementById('justifyCrop');
+// =====================================================
+// STEP 3: CROPS
+// =====================================================
+const cropGrid = document.getElementById("cropGrid");
+const next2 = document.getElementById("next2");
+const cropResearch = document.getElementById("cropResearch");
+const justifyCrop = document.getElementById("justifyCrop");
 
 function renderCrops() {
-  cropGrid.innerHTML = '';
+  cropGrid.innerHTML = "";
   state.crop = null;
   next2.disabled = true;
-  cropResearch.style.display = 'none';
-  justifyCrop.value = '';
+  cropResearch.style.display = "none";
+  justifyCrop.value = "";
   crops.forEach(c => {
     const suits = c.suits.includes(state.region.id);
-    const div = document.createElement('div');
-    div.className = 'option' + (suits ? '' : ' disabled');
-    div.innerHTML = `<h3>${c.name}</h3><div class="meta">Water demand: ${c.water}</div>` +
-      (!suits ? `<div class="warn">${c.warning}</div>` : '');
+    const div = document.createElement("div");
+    div.className = "option" + (suits ? "" : " disabled");
+    const waterClass = c.water.includes("very") || c.water.includes("high") ? "high" :
+                       c.water.includes("moderate") ? "med" : "low";
+    div.innerHTML = `
+      <span class="icon">${c.icon}</span>
+      <h3>${c.name}</h3>
+      <span class="tag ${waterClass}">Water: ${c.water}</span>
+      ${!suits ? `<div class="warn">${c.warning}</div>` : ""}`;
     if (suits) {
-      div.addEventListener('click', () => {
-        cropGrid.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-        div.classList.add('selected');
+      div.addEventListener("click", () => {
+        cropGrid.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
+        div.classList.add("selected");
         state.crop = c;
-        cropResearch.style.display = 'block';
+        cropResearch.style.display = "block";
         checkCropReady();
       });
     }
@@ -665,34 +691,39 @@ function renderCrops() {
 function checkCropReady() {
   next2.disabled = !(state.crop && justifyCrop.value.trim().length >= 20);
 }
-justifyCrop.addEventListener('input', () => { state.justifyCrop = justifyCrop.value.trim(); checkCropReady(); });
-next2.addEventListener('click', () => { renderChallenges(); showStep(3); });
+justifyCrop.addEventListener("input", () => { state.justifyCrop = justifyCrop.value.trim(); checkCropReady(); });
+next2.addEventListener("click", () => { renderChallenges(); showStep(3); });
 
-// ---------- STEP 4: CHALLENGES ----------
-const challengeGrid = document.getElementById('challengeGrid');
-const next3 = document.getElementById('next3');
-const challengeResearch = document.getElementById('challengeResearch');
-const justifyChallenge = document.getElementById('justifyChallenge');
+// =====================================================
+// STEP 4: CHALLENGES
+// =====================================================
+const challengeGrid = document.getElementById("challengeGrid");
+const next3 = document.getElementById("next3");
+const challengeResearch = document.getElementById("challengeResearch");
+const justifyChallenge = document.getElementById("justifyChallenge");
 
 function renderChallenges() {
-  challengeGrid.innerHTML = '';
+  challengeGrid.innerHTML = "";
   state.challenge = null;
   next3.disabled = true;
-  challengeResearch.style.display = 'none';
-  justifyChallenge.value = '';
+  challengeResearch.style.display = "none";
+  justifyChallenge.value = "";
   const relevant = challenges.filter(c => c.regions.includes(state.region.id));
   const others = challenges.filter(c => !c.regions.includes(state.region.id));
   [...relevant, ...others].forEach(c => {
     const fits = c.regions.includes(state.region.id);
-    const div = document.createElement('div');
-    div.className = 'option';
-    div.innerHTML = `<h3>${c.name}</h3><div class="meta">${c.desc}</div>` +
-      (!fits ? `<div class="warn" style="background:var(--amber-light);color:var(--amber);">Less common in ${state.region.name}, but possible.</div>` : '');
-    div.addEventListener('click', () => {
-      challengeGrid.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-      div.classList.add('selected');
+    const div = document.createElement("div");
+    div.className = "option";
+    div.innerHTML = `
+      <span class="icon">${c.icon}</span>
+      <h3>${c.name}</h3>
+      <div class="meta">${c.desc}</div>
+      ${!fits ? `<div class="warn" style="background:var(--amber-light);color:var(--amber);">Less common in ${state.region.name}, but possible.</div>` : ""}`;
+    div.addEventListener("click", () => {
+      challengeGrid.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
+      div.classList.add("selected");
       state.challenge = c;
-      challengeResearch.style.display = 'block';
+      challengeResearch.style.display = "block";
       checkChallengeReady();
     });
     challengeGrid.appendChild(div);
@@ -701,30 +732,35 @@ function renderChallenges() {
 function checkChallengeReady() {
   next3.disabled = !(state.challenge && justifyChallenge.value.trim().length >= 20);
 }
-justifyChallenge.addEventListener('input', () => { state.justifyChallenge = justifyChallenge.value.trim(); checkChallengeReady(); });
-next3.addEventListener('click', () => { renderStrategies(); showStep(4); });
+justifyChallenge.addEventListener("input", () => { state.justifyChallenge = justifyChallenge.value.trim(); checkChallengeReady(); });
+next3.addEventListener("click", () => { renderStrategies(); showStep(4); });
 
-// ---------- STEP 5: STRATEGIES ----------
-const strategyGrid = document.getElementById('strategyGrid');
-const next4 = document.getElementById('next4');
-const strategyResearch = document.getElementById('strategyResearch');
-const justifyStrategy = document.getElementById('justifyStrategy');
+// =====================================================
+// STEP 5: STRATEGIES
+// =====================================================
+const strategyGrid = document.getElementById("strategyGrid");
+const next4 = document.getElementById("next4");
+const strategyResearch = document.getElementById("strategyResearch");
+const justifyStrategy = document.getElementById("justifyStrategy");
 
 function renderStrategies() {
-  strategyGrid.innerHTML = '';
+  strategyGrid.innerHTML = "";
   state.strategy = null;
   next4.disabled = true;
-  strategyResearch.style.display = 'none';
-  justifyStrategy.value = '';
+  strategyResearch.style.display = "none";
+  justifyStrategy.value = "";
   strategies.forEach(s => {
-    const div = document.createElement('div');
-    div.className = 'option';
-    div.innerHTML = `<h3>${s.name}</h3><div class="meta">${s.helps}</div>`;
-    div.addEventListener('click', () => {
-      strategyGrid.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-      div.classList.add('selected');
+    const div = document.createElement("div");
+    div.className = "option";
+    div.innerHTML = `
+      <span class="icon">${s.icon}</span>
+      <h3>${s.name}</h3>
+      <div class="meta">${s.helps}</div>`;
+    div.addEventListener("click", () => {
+      strategyGrid.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
+      div.classList.add("selected");
       state.strategy = s;
-      strategyResearch.style.display = 'block';
+      strategyResearch.style.display = "block";
       checkStrategyReady();
     });
     strategyGrid.appendChild(div);
@@ -733,166 +769,293 @@ function renderStrategies() {
 function checkStrategyReady() {
   next4.disabled = !(state.strategy && justifyStrategy.value.trim().length >= 20);
 }
-justifyStrategy.addEventListener('input', () => { state.justifyStrategy = justifyStrategy.value.trim(); checkStrategyReady(); });
-next4.addEventListener('click', () => { updateScoreDisplay(); showStep(5); });
+justifyStrategy.addEventListener("input", () => { state.justifyStrategy = justifyStrategy.value.trim(); checkStrategyReady(); });
+next4.addEventListener("click", () => { resetSeasons(); showStep(5); });
 
-// ---------- STEP 6: DICE ROLL ----------
-const dice = document.getElementById('dice');
-const rollBtn = document.getElementById('rollBtn');
-const outcomeArea = document.getElementById('outcomeArea');
-const next5 = document.getElementById('next5');
-const scoreValue = document.getElementById('scoreValue');
-const scoreBar = document.getElementById('scoreBar');
-let hasRolled = false;
+// =====================================================
+// STEP 6: THREE SEASONS
+// =====================================================
+const rollBtn = document.getElementById("rollBtn");
+const next5 = document.getElementById("next5");
+const runningScoreEl = document.getElementById("runningScore");
+const runningBarEl = document.getElementById("runningBar");
+let currentSeasonIndex = 0;
 
-function updateScoreDisplay() {
-  scoreValue.textContent = state.score;
-  const pct = Math.max(0, Math.min(100, (state.score + 5) * 5));
-  scoreBar.style.width = pct + '%';
-  scoreBar.style.background = state.score < 0 ? 'var(--red)' : state.score < 2 ? 'var(--amber)' : 'var(--green)';
+function resetSeasons() {
+  state.seasons = [];
+  state.total = 0;
+  currentSeasonIndex = 0;
+  runningScoreEl.textContent = "0";
+  runningScoreEl.className = "score-value";
+  runningBarEl.style.width = "0%";
+  next5.disabled = true;
+  rollBtn.disabled = false;
+  rollBtn.textContent = "Roll Season 1 🎲";
+  ["season-1","season-2","season-3"].forEach((id, i) => {
+    const card = document.getElementById(id);
+    card.className = "season-card pending";
+    card.querySelector(".season-dice").textContent = "?";
+    card.querySelector(".season-dice").classList.remove("rolling","final");
+    card.querySelector(".season-result").innerHTML = '<span class="rolling-text">Not yet rolled</span>';
+  });
 }
 
-// Determine match quality between strategy and challenge
-function getMatchQuality() {
-  if (!state.strategy || !state.challenge) return 0;
-  if (state.strategy.goodAgainst.includes(state.challenge.type)) return 2;
-  // partial: strategy helps against at least one challenge type in general
-  return 1;
+function pickEvent(challengeType) {
+  // 70% chance the event is related to the chosen challenge,
+  // 30% chance it's an "out of category" event. This adds variety
+  // and stops the strategy bonus being a guaranteed thing.
+  let type = challengeType;
+  if (Math.random() > 0.7) {
+    const others = Object.keys(EVENTS_BY_TYPE).filter(t => t !== challengeType);
+    type = others[Math.floor(Math.random() * others.length)];
+  }
+  const pool = EVENTS_BY_TYPE[type];
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 function rollD20() {
   return Math.floor(Math.random() * 20) + 1;
 }
 
-rollBtn.addEventListener('click', () => {
-  if (hasRolled) return;
-  hasRolled = true;
-  rollBtn.disabled = true;
-  dice.classList.add('rolling');
+function computeOutcome(roll) {
+  const event = pickEvent(state.challenge.type);
+  const matched = state.strategy.goodAgainst.includes(event.type);
+  const bonus = matched ? 2 : -1;
+  const adjusted = roll + bonus;
+
+  let score, band, message;
+  if (adjusted >= 18) {
+    score = 3; band = "excellent";
+    message = matched
+      ? "A bumper season! Your strategy paid off beautifully."
+      : "A lucky season — the weather was kind, not your strategy.";
+  } else if (adjusted >= 14) {
+    score = 2; band = "good";
+    message = matched
+      ? "A solid season. Your strategy helped you through."
+      : "Decent season, but not thanks to your strategy.";
+  } else if (adjusted >= 10) {
+    score = 1; band = "ok";
+    message = matched
+      ? "A mixed season, but your strategy reduced the damage."
+      : "Mixed season — your strategy didn't really help.";
+  } else if (adjusted >= 6) {
+    score = 0; band = "mixed";
+    message = matched
+      ? "A hard season. Your strategy helped you break even."
+      : "Hard season, and your strategy didn't help.";
+  } else if (adjusted >= 3) {
+    score = -1; band = "bad";
+    message = matched
+      ? "A difficult season. Even your strategy couldn't prevent losses."
+      : "Tough season. Your strategy couldn't help here.";
+  } else {
+    score = -2; band = "disaster";
+    message = matched
+      ? "A devastating season. Even the best planning can't stop nature."
+      : "Disaster. Your strategy was poorly matched to this event.";
+  }
+  return { roll, event, matched, bonus, adjusted, score, band, message };
+}
+
+function rollSeason(seasonNum) {
+  const card = document.getElementById(`season-${seasonNum}`);
+  const diceEl = card.querySelector(".season-dice");
+  const resultEl = card.querySelector(".season-result");
+
+  card.classList.remove("pending");
+  diceEl.classList.add("rolling");
+  resultEl.innerHTML = '<span class="rolling-text">Rolling...</span>';
 
   let ticks = 0;
   const interval = setInterval(() => {
-    dice.textContent = rollD20();
+    diceEl.textContent = rollD20();
     ticks++;
-    if (ticks > 15) {
+    if (ticks >= 12) {
       clearInterval(interval);
-      dice.classList.remove('rolling');
-      finaliseRoll();
+      finishRoll(seasonNum, card, diceEl, resultEl);
     }
   }, 80);
+}
+
+function finishRoll(seasonNum, card, diceEl, resultEl) {
+  // IMPORTANT: this is the ONE roll that gets used, both for the
+  // dice display AND for the score. No re-rolling.
+  const roll = rollD20();
+  const outcome = computeOutcome(roll);
+
+  diceEl.textContent = roll;
+  diceEl.classList.remove("rolling");
+  diceEl.classList.add("final");
+
+  card.classList.add(outcome.band);
+
+  resultEl.innerHTML = `
+    <div class="event-display">${outcome.event.icon}</div>
+    <div style="font-weight:700;">${outcome.event.name}</div>
+    <div class="roll-display">Rolled ${roll}${outcome.matched ? " +2 bonus" : " −1"} = ${outcome.adjusted}</div>
+    <div class="delta-display ${outcome.score >= 0 ? "positive" : "negative"}">
+      ${outcome.score >= 0 ? "+" : ""}${outcome.score} pts
+    </div>
+    <div class="message-display">${outcome.message}</div>
+    <div class="match-badge ${outcome.matched ? "" : "miss"}">
+      ${outcome.matched ? "✓ Your strategy helped" : "✗ Strategy not suited to this event"}
+    </div>`;
+
+  state.seasons.push({ season: seasonNum, ...outcome });
+  state.total += outcome.score;
+  updateRunningScore();
+
+  if (seasonNum < 3) {
+    rollBtn.textContent = `Roll Season ${seasonNum + 1} 🎲`;
+  } else {
+    rollBtn.textContent = "All seasons rolled ✓";
+    rollBtn.disabled = true;
+    next5.disabled = false;
+  }
+}
+
+function updateRunningScore() {
+  runningScoreEl.textContent = (state.total >= 0 ? "+" : "") + state.total;
+  runningScoreEl.className = "score-value " + (state.total > 0 ? "positive" : state.total < 0 ? "negative" : "");
+  const pct = Math.max(0, Math.min(100, ((state.total + 6) / 15) * 100));
+  runningBarEl.style.width = pct + "%";
+  runningBarEl.style.background = state.total < 0 ? "#ff9e8e" : "#a5e8a5";
+}
+
+rollBtn.addEventListener("click", () => {
+  if (currentSeasonIndex >= 3) return;
+  currentSeasonIndex++;
+  rollSeason(currentSeasonIndex);
 });
 
-function finaliseRoll() {
-  const roll = rollD20();
-  dice.textContent = roll;
-  state.roll = roll;
-  const match = getMatchQuality();
-  const challengeType = state.challenge.type;
-  const regionChance = state.region.chance;
+next5.addEventListener("click", () => { renderSummary(); showStep(6); });
 
-  const outcome = getOutcome(roll, match, challengeType, regionChance);
-  state.outcome = outcome;
-  state.score += outcome.score;
-
-  const matchLabel = match === 2 ? "strong match" : match === 1 ? "partial match" : "weak match";
-  const matchColor = match === 2 ? "var(--green)" : match === 1 ? "var(--amber)" : "var(--red)";
-
-  outcomeArea.innerHTML = `
-    <div class="outcome ${outcome.band}">
-      <h3>${outcome.title}</h3>
-      <p>${outcome.body}</p>
-      <p style="margin-top:12px;font-size:0.85rem;color:var(--muted);">
-        Roll: <strong>${roll}</strong> · Strategy vs challenge: <strong style="color:${matchColor};">${matchLabel}</strong>
-        · Season impact: <span class="delta" style="color:${outcome.score >= 0 ? 'var(--green)' : 'var(--red)'};">${outcome.score >= 0 ? '+' : ''}${outcome.score} points</span>
-      </p>
-    </div>
-    <div class="roll-history">
-      Your region's climate also influenced the outcome: ${state.region.name} is ${state.region.note.toLowerCase()}
-    </div>
-  `;
-  updateScoreDisplay();
-  next5.disabled = false;
-}
-next5.addEventListener('click', () => { renderSummary(); showStep(6); });
-
-// ---------- STEP 7: SUMMARY ----------
+// =====================================================
+// STEP 7: SUMMARY
+// =====================================================
 function renderSummary() {
   const s = state;
-  const el = document.getElementById('summary');
-  const scoreBand = s.score >= 4 ? 'ok' : s.score >= 0 ? 'warn' : 'warn';
-  const scoreLabel = s.score >= 4 ? 'A resilient farm' : s.score >= 0 ? 'A farm that survived the season' : 'A farm that struggled';
+  const el = document.getElementById("summary");
+
+  const band = s.total >= 7 ? "thriving" :
+               s.total >= 4 ? "resilient" :
+               s.total >= 0 ? "surviving" :
+               s.total >= -3 ? "struggling" : "failed";
+  const bandLabel = {
+    thriving: "🌳 Thriving farm",
+    resilient: "🌿 Resilient farm",
+    surviving: "🌱 Surviving farm",
+    struggling: "🍂 Struggling farm",
+    failed: "🥀 Failed farm"
+  }[band];
+
+  const seasonPills = s.seasons.map(r => `
+    <span class="season-pill ${r.band}">
+      ${r.event.icon} Yr ${r.season}: ${r.event.name} (${r.score >= 0 ? "+" : ""}${r.score})
+    </span>`).join("");
+
   el.innerHTML = `
     <h3>${escapeHtml(s.farmName)}</h3>
     <div class="farm-byline">Run by ${escapeHtml(s.farmers)}</div>
     <dl>
-      <dt>Region</dt><dd>${s.region.name} — ${s.region.climate}</dd>
-      <dt>Why this region</dt><dd>${s.justifyRegion ? escapeHtml(s.justifyRegion) : '<em>Not provided</em>'}</dd>
+      <dt><span class="icon">${s.region.icon}</span> Region</dt>
+      <dd>${s.region.name} — ${s.region.climate}</dd>
+      <dt>Why this region</dt>
+      <dd>${s.justifyRegion ? escapeHtml(s.justifyRegion) : "<em>Not provided</em>"}</dd>
 
-      <dt>Produce</dt><dd>${s.crop.name} (water demand: ${s.crop.water})</dd>
-      <dt>Research on the crop</dt><dd>${s.justifyCrop ? escapeHtml(s.justifyCrop) : '<em>Not provided</em>'}</dd>
+      <dt><span class="icon">${s.crop.icon}</span> Produce</dt>
+      <dd>${s.crop.name} (water demand: ${s.crop.water})</dd>
+      <dt>Research on the crop</dt>
+      <dd>${s.justifyCrop ? escapeHtml(s.justifyCrop) : "<em>Not provided</em>"}</dd>
 
-      <dt>Challenge</dt><dd>${s.challenge.name} — ${s.challenge.desc}</dd>
-      <dt>How the challenge affects the farm</dt><dd>${s.justifyChallenge ? escapeHtml(s.justifyChallenge) : '<em>Not provided</em>'}</dd>
+      <dt><span class="icon">${s.challenge.icon}</span> Challenge</dt>
+      <dd>${s.challenge.name} — ${s.challenge.desc}</dd>
+      <dt>How the challenge affects the farm</dt>
+      <dd>${s.justifyChallenge ? escapeHtml(s.justifyChallenge) : "<em>Not provided</em>"}</dd>
 
-      <dt>Sustainable strategy</dt><dd>${s.strategy.name} — ${s.strategy.helps}</dd>
-      <dt>Research on the strategy</dt><dd>${s.justifyStrategy ? escapeHtml(s.justifyStrategy) : '<em>Not provided</em>'}</dd>
+      <dt><span class="icon">${s.strategy.icon}</span> Sustainable strategy</dt>
+      <dd>${s.strategy.name} — ${s.strategy.helps}</dd>
+      <dt>Research on the strategy</dt>
+      <dd>${s.justifyStrategy ? escapeHtml(s.justifyStrategy) : "<em>Not provided</em>"}</dd>
 
-      <dt>Season of chance (d20 roll: ${s.roll})</dt>
-      <dd><strong>${s.outcome.title}</strong> — ${s.outcome.body}</dd>
-
-      <dt>Sustainability score</dt><dd>${s.score} / 10</dd>
+      <dt>Three seasons of chance</dt>
+      <dd>
+        <div class="season-summary">${seasonPills}</div>
+        <p style="margin-top:10px;">Total: <strong>${s.total >= 0 ? "+" : ""}${s.total} points</strong> (max 9)</p>
+      </dd>
     </dl>
-    <div class="badge ${scoreBand}">${scoreLabel}</div>
+    <div class="badge ${band}">${bandLabel}</div>
   `;
+
+  // Celebrate a good score
+  if (s.total >= 4) launchConfetti();
 }
 
 function escapeHtml(str) {
-  return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  return String(str).replace(/[&<>"']/g, m =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
 }
 
-document.getElementById('printBtn').addEventListener('click', () => window.print());
+function launchConfetti() {
+  const emojis = ["🌾","🌟","🎉","🐑","🌱","☀️","🍊","🏆"];
+  for (let i = 0; i < 30; i++) {
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.animationDelay = Math.random() * 0.8 + "s";
+    c.style.animationDuration = (2 + Math.random() * 2) + "s";
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 5000);
+  }
+}
 
-document.getElementById('copyBtn').addEventListener('click', async () => {
+document.getElementById("printBtn").addEventListener("click", () => window.print());
+
+document.getElementById("copyBtn").addEventListener("click", async () => {
   const s = state;
+  const seasonLines = s.seasons.map(r =>
+    `  Year ${r.season}: ${r.event.name} — rolled ${r.roll}, score ${r.score >= 0 ? "+" : ""}${r.score}`
+  ).join("\n");
   const text =
 `FARM DESIGN PITCH
 Farm: ${s.farmName}
 Farmer(s): ${s.farmers}
 
 REGION: ${s.region.name} — ${s.region.climate}
-Justification: ${s.justifyRegion || '(not provided)'}
+Justification: ${s.justifyRegion || "(not provided)"}
 
 PRODUCE: ${s.crop.name} (water demand: ${s.crop.water})
-Research: ${s.justifyCrop || '(not provided)'}
+Research: ${s.justifyCrop || "(not provided)"}
 
 CHALLENGE: ${s.challenge.name} — ${s.challenge.desc}
-Impact: ${s.justifyChallenge || '(not provided)'}
+Impact: ${s.justifyChallenge || "(not provided)"}
 
-SUSTAINABLE STRATEGY: ${s.strategy.name} — ${s.strategy.helps}
-Research: ${s.justifyStrategy || '(not provided)'}
+STRATEGY: ${s.strategy.name} — ${s.strategy.helps}
+Research: ${s.justifyStrategy || "(not provided)"}
 
-SEASON OF CHANCE (d20 roll: ${s.roll})
-${s.outcome.title} — ${s.outcome.body}
+THREE SEASONS
+${seasonLines}
 
-Sustainability score: ${s.score} / 10`;
+Total score: ${s.total >= 0 ? "+" : ""}${s.total} / 9`;
   try {
     await navigator.clipboard.writeText(text);
-    const msg = document.getElementById('copyMsg');
-    msg.style.display = 'block';
-    setTimeout(() => msg.style.display = 'none', 2500);
+    const msg = document.getElementById("copyMsg");
+    msg.style.display = "block";
+    setTimeout(() => msg.style.display = "none", 2500);
   } catch (e) {
-    alert('Copy failed — please select and copy manually.');
+    alert("Copy failed — please select and copy manually.");
   }
 });
 
-document.getElementById('restartBtn').addEventListener('click', () => {
-  if (!confirm('Start over? This will clear all your answers.')) return;
+document.getElementById("restartBtn").addEventListener("click", () => {
+  if (!confirm("Start over? This will clear all your answers.")) return;
   location.reload();
 });
 
-// ---------- BACK BUTTONS ----------
-document.querySelectorAll('[data-back]').forEach(btn => {
-  btn.addEventListener('click', () => showStep(currentStep - 1));
+document.querySelectorAll("[data-back]").forEach(btn => {
+  btn.addEventListener("click", () => showStep(currentStep - 1));
 });
 </script>
 </body>
